@@ -5,7 +5,8 @@ import tensorflow as tf
 import cv2
 import sys
 sys.path.append("game/")
-import wrapped_flappy_bird as game
+import os
+import game.wrapped_flappy_bird as game
 import random
 import numpy as np
 from collections import deque
@@ -13,13 +14,17 @@ from collections import deque
 GAME = 'bird' # the name of the game being played for log files
 ACTIONS = 2 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 100000. # timesteps to observe before training
-EXPLORE = 2000000. # frames over which to anneal epsilon
-FINAL_EPSILON = 0.0001 # final value of epsilon
-INITIAL_EPSILON = 0.0001 # starting value of epsilon
+# OBSERVE = 100000. # timesteps to observe before training
+# EXPLORE = 2000000. # frames over which to anneal epsilon
+# FINAL_EPSILON = 0.0001 # final value of epsilon
+# INITIAL_EPSILON = 0.0001 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
 BATCH = 32 # size of minibatch
 FRAME_PER_ACTION = 1
+OBSERVE = 10000
+EXPLORE = 3000000
+FINAL_EPSILON = 0.0001
+INITIAL_EPSILON = 0.1
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev = 0.01)
@@ -90,8 +95,10 @@ def trainNetwork(s, readout, h_fc1, sess):
     D = deque()
 
     # printing
-    a_file = open("logs_" + GAME + "/readout.txt", 'w')
-    h_file = open("logs_" + GAME + "/hidden.txt", 'w')
+    a_file = open(os.path.normpath(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), "logs_" + GAME + "/readout.txt")), 'w')
+    h_file = open(os.path.normpath(os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), "logs_" + GAME + "/hidden.txt")), 'w')
 
     # get the first state by doing nothing and preprocess the image to 80x80x4
     do_nothing = np.zeros(ACTIONS)
